@@ -112,9 +112,17 @@ int i;
         if ( !strncmp( argv[i], "arraysize=", 10 ) )
               ARRAY_SIZE = argv[i]+10;
         else
-        if ( !strncmp( argv[i], "delimiter=", 10 ) )
+        if ( !strncmp( argv[i], "delimiter=", 10 ) ) {
               DELIMITER = argv[i]+10;
-        else
+              char b[] = "0x";
+              int i = is_begin_with(DELIMITER, b);
+              if (1==i) {
+                  int nValude=0;
+                  sscanf(DELIMITER, "%x", &nValude);
+                  DELIMITER[0]=nValude;
+                  DELIMITER[1]=0x00;
+              }
+        } else
         if ( !strncmp( argv[i], "enclosure=", 10 ) )
               ENCLOSURE = argv[i]+10;
         else
@@ -407,6 +415,26 @@ int    is_string = 1;
 
     EXEC SQL COMMIT WORK;
     fprintf( stderr, "%d rows extracted\n", row_count );
+}
+
+int is_begin_with(const char * str1,char * str2)
+{
+    if(str1 == NULL || str2 == NULL)
+        return -1;
+    int len1 = strlen(str1);
+    int len2 = strlen(str2);
+    if((len1 < len2) ||  (len1 == 0 || len2 == 0))
+        return -1;
+    char *p = str2;
+    int i = 0;
+    while(*p != '\0')
+    {
+        if(*p != str1[i])
+            return 0;
+        p++;
+        i++;
+    }
+    return 1;
 }
 
 main( argc, argv )
